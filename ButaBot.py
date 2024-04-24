@@ -1,4 +1,3 @@
-# This example requires the 'message_content' intent.
 
 import discord
 from discord.ext import commands
@@ -9,9 +8,6 @@ intents.message_content = True
 intents.members = True
 
 bot = commands.Bot(command_prefix = '>', intents = intents)
-
-
-# Testing!
 
 
 class ConfirmLeave(discord.ui.View):
