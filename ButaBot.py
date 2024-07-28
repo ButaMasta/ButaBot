@@ -1,4 +1,3 @@
-
 import discord
 from discord.ext import commands
 import database as db
@@ -8,7 +7,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = commands.Bot(command_prefix = ">", intents = intents)
+bot = commands.Bot(command_prefix=">", intents=intents)
 
 
 class ConfirmLeave(discord.ui.View):
@@ -16,7 +15,7 @@ class ConfirmLeave(discord.ui.View):
         super().__init__(timeout=30)
         self.value = None
 
-    @discord.ui.button(label = "Leave", style = discord.ButtonStyle.red)
+    @discord.ui.button(label="Leave", style=discord.ButtonStyle.red)
     async def confirm(self, interaction, button):
         button.label = "Left"
         button.disabled = True
@@ -24,7 +23,7 @@ class ConfirmLeave(discord.ui.View):
         await interaction.response.edit_message(view=self)
         self.stop()
 
-    @discord.ui.button(label = "Stay", style = discord.ButtonStyle.green)
+    @discord.ui.button(label="Stay", style=discord.ButtonStyle.green)
     async def cancel(self, interaction, button):
         button.label = "Stayed"
         button.disabled = True
@@ -65,11 +64,16 @@ async def leave(ctx):
             await ctx.send(f"You've already left swap due to being banned.")
         else:
             view = ConfirmLeave()
-            await ctx.send(f"Are you sure that you want to leave, {user.name}?\nRemember, if swap has started then leaving will result in you being banned from the next swap.", view=view)
-            
+            await ctx.send(
+                f"""Are you sure that you want to leave, {user.name}?\nRemember, if swap has started then leaving will 
+                result in you being banned from the next swap.""",
+                view=view)
+
             await view.wait()
             if view.value is None:
-                await ctx.send("The interaction timed out, nothing was performed, please redo your command if you wish to try again.")
+                await ctx.send(
+                    """The interaction timed out, nothing was performed, please redo your command if you wish to try 
+                    again.""")
                 return
             elif view.value is True:
                 db.leave_swap(user.id)
@@ -82,7 +86,7 @@ async def leave(ctx):
 
 
 @bot.command()
-async def letter(ctx, *, msg: str=''):
+async def letter(ctx, *, msg: str = ''):
     user = ctx.author
     if db.in_db(user.id):
         letter = db.get_letter(user.id)
@@ -112,6 +116,7 @@ async def read(ctx):
 @bot.command()
 async def butatime(ctx):
     await ctx.send(f"Right now it is {datetime.now().strftime('%H:%M:%S')} for buta.")
+
 
 @bot.command()
 async def ryuu(ctx):
@@ -156,17 +161,17 @@ async def list_swap(ctx):
         santa_ids = db.get_user_ids_in_swap()
         output = "## Users in this swap:\n"
         first_id = santa_ids.pop()
-        id = first_id
+        cur_id = first_id
         for _ in range(len(santa_ids) + 1):
-            user = bot.get_user(id)
-            if user != None:
+            user = bot.get_user(cur_id)
+            if user is not None:
                 output += str(user.name) + " -> "
             else:
-                output += str(id) + " -> "
-            id = db.get_giftee(id)
+                output += str(cur_id) + " -> "
+            cur_id = db.get_giftee(cur_id)
 
         user = bot.get_user(first_id)
-        if user != None:
+        if user is not None:
             output += str(user.name)
         else:
             output += str(first_id)
@@ -183,7 +188,7 @@ async def debug(ctx):
         await ctx.send("You're no admin!! :bonk:")
 
 
-file = open("../../pass/bottoken.txt", "r")
+file = open("../../pass/bot_token.txt", "r")
 token = file.read()
 file.close()
 bot.run(token)
